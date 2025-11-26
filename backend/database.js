@@ -1,7 +1,6 @@
-const sqlite3 = require('sqlite3').verbose();
+const Database = require('better-sqlite3');
 const path = require('path');
 const fs = require('fs');
-const { promisify } = require('util');
 
 const dbPath = process.env.DATABASE_PATH || path.join(__dirname, 'data', 'botomatic.db');
 const dbDir = path.dirname(dbPath);
@@ -11,34 +10,22 @@ if (!fs.existsSync(dbDir)) {
   fs.mkdirSync(dbDir, { recursive: true });
 }
 
-const db = new sqlite3.Database(dbPath, (err) => {
-  if (err) {
-    console.error('❌ Database connection error:', err);
-  } else {
-    console.log('✅ Database initialized at:', dbPath);
-  }
-});
-
-// Promisify database methods
-db.runAsync = promisify(db.run.bind(db));
-db.getAsync = promisify(db.get.bind(db));
-db.allAsync = promisify(db.all.bind(db));
+console.log('Initializing database at:', dbPath);
+const db = new Database(dbPath, { verbose: console.log });
 
 // Enable foreign keys
-db.run('PRAGMA foreign_keys = ON');
+db.pragma('foreign_keys = ON');
 
 // Create tables
-db.serialize(() => {
-  db.run(`
+const createTables = () => {
+  db.exec(`
     CREATE TABLE IF NOT EXISTS users (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       email TEXT UNIQUE NOT NULL,
       password_hash TEXT NOT NULL,
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-    )
-  `);
+    );
 
-  db.run(`
     CREATE TABLE IF NOT EXISTS bots (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       user_id INTEGER,
@@ -55,10 +42,8 @@ db.serialize(() => {
       price INTEGER NOT NULL,
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
       FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL
-    )
-  `);
+    );
 
-  db.run(`
     CREATE TABLE IF NOT EXISTS conversations (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       bot_id INTEGER NOT NULL,
@@ -67,10 +52,8 @@ db.serialize(() => {
       updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
       FOREIGN KEY (bot_id) REFERENCES bots(id) ON DELETE CASCADE,
       FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE SET NULL
-    )
-  `);
+    );
 
-  db.run(`
     CREATE TABLE IF NOT EXISTS messages (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       conversation_id INTEGER NOT NULL,
@@ -78,13 +61,17 @@ db.serialize(() => {
       content TEXT NOT NULL,
       timestamp DATETIME DEFAULT CURRENT_TIMESTAMP,
       FOREIGN KEY (conversation_id) REFERENCES conversations(id) ON DELETE CASCADE
-    )
+    );
+
+    CREATE INDEX IF NOT EXISTS idx_bots_redemption_code ON bots(redemption_code);
+    CREATE INDEX IF NOT EXISTS idx_bots_user_id ON bots(user_id);
+    CREATE INDEX IF NOT EXISTS idx_conversations_bot_id ON conversations(bot_id);
+    CREATE INDEX IF NOT EXISTS idx_messages_conversation_id ON messages(conversation_id);
   `);
 
-  db.run('CREATE INDEX IF NOT EXISTS idx_bots_redemption_code ON bots(redemption_code)');
-  db.run('CREATE INDEX IF NOT EXISTS idx_bots_user_id ON bots(user_id)');
-  db.run('CREATE INDEX IF NOT EXISTS idx_conversations_bot_id ON conversations(bot_id)');
-  db.run('CREATE INDEX IF NOT EXISTS idx_messages_conversation_id ON messages(conversation_id)');
-});
+  console.log('✅ Database tables initialized');
+};
+
+createTables();
 
 module.exports = db;
