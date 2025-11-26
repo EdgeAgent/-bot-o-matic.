@@ -237,10 +237,14 @@ function ChatView({ bot, messages, inputMessage, setInputMessage, handleSendMess
     return (
         <div className={styles.chatView}>
             {/* Header */}
-            <div className={styles.chatHeader}>
-                <div className={styles.botAvatar} style={{ background: bot.egg_design.color }}>
-                    {bot.name.charAt(0)}
-                </div>
+            <div className={styles.chatHeader} style={{ background: bot.header_color || undefined }}>
+                {bot.logo_url ? (
+                    <img src={bot.logo_url} alt="Bot Logo" className={styles.botAvatar} style={{ objectFit: 'cover' }} />
+                ) : (
+                    <div className={styles.botAvatar} style={{ background: bot.egg_design.color }}>
+                        {bot.name.charAt(0)}
+                    </div>
+                )}
                 <div className={styles.botHeaderInfo}>
                     <h2>{bot.name}</h2>
                     <p>{bot.personality.archetype}</p>
@@ -259,9 +263,13 @@ function ChatView({ bot, messages, inputMessage, setInputMessage, handleSendMess
                             transition={{ delay: index * 0.1 }}
                         >
                             {msg.role === 'assistant' && (
-                                <div className={styles.avatar} style={{ background: bot.egg_design.color }}>
-                                    {bot.name.charAt(0)}
-                                </div>
+                                bot.logo_url ? (
+                                    <img src={bot.logo_url} alt="Bot" className={styles.avatar} style={{ objectFit: 'cover' }} />
+                                ) : (
+                                    <div className={styles.avatar} style={{ background: bot.egg_design.color }}>
+                                        {bot.name.charAt(0)}
+                                    </div>
+                                )
                             )}
                             <div className={styles.messageContent}>
                                 <p>{msg.content}</p>
@@ -275,9 +283,13 @@ function ChatView({ bot, messages, inputMessage, setInputMessage, handleSendMess
 
                 {sending && (
                     <div className={`${styles.message} ${styles.assistant}`}>
-                        <div className={styles.avatar} style={{ background: bot.egg_design.color }}>
-                            {bot.name.charAt(0)}
-                        </div>
+                        {bot.logo_url ? (
+                            <img src={bot.logo_url} alt="Bot" className={styles.avatar} style={{ objectFit: 'cover' }} />
+                        ) : (
+                            <div className={styles.avatar} style={{ background: bot.egg_design.color }}>
+                                {bot.name.charAt(0)}
+                            </div>
+                        )}
                         <div className={styles.messageContent}>
                             <div className={styles.typing}>
                                 <span></span>

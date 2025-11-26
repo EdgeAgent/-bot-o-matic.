@@ -29,6 +29,8 @@ export default function VendingMachine() {
         tone: 50, // 0-100 slider (formal to casual)
         knowledgeBase: '',
         systemPrompt: '', // New field for advanced mode
+        logoUrl: '', // New field for branding
+        headerColor: '#4f46e5', // New field for branding
         llmProvider: 'botomatic',
         apiKey: '',
         llmModel: '',
@@ -66,6 +68,8 @@ export default function VendingMachine() {
                 tone: toneText,
                 knowledge_base: config.knowledgeBase,
                 system_prompt: config.systemPrompt || null, // Pass system prompt
+                logo_url: config.logoUrl || null,
+                header_color: config.headerColor || null,
                 llm_provider: config.llmProvider,
                 llm_model: config.llmModel || null,
                 api_key: config.apiKey || null,
@@ -234,6 +238,35 @@ function Step1Customization({ config, setConfig, showAdvanced, setShowAdvanced, 
                             style={{ fontFamily: 'monospace' }}
                         />
                         <small className={styles.hint}>Directly edit the System Prompt (overrides auto-generation)</small>
+
+                        <div style={{ marginTop: '1rem' }}>
+                            <label>Custom Logo URL (Optional)</label>
+                            <input
+                                type="text"
+                                placeholder="https://example.com/logo.png"
+                                value={config.logoUrl}
+                                onChange={(e) => setConfig({ ...config, logoUrl: e.target.value })}
+                                className={styles.input}
+                            />
+                        </div>
+
+                        <div style={{ marginTop: '1rem' }}>
+                            <label>Header Color</label>
+                            <div style={{ display: 'flex', gap: '0.5rem' }}>
+                                <input
+                                    type="color"
+                                    value={config.headerColor}
+                                    onChange={(e) => setConfig({ ...config, headerColor: e.target.value })}
+                                    style={{ width: '50px', padding: '0', height: '40px' }}
+                                />
+                                <input
+                                    type="text"
+                                    value={config.headerColor}
+                                    onChange={(e) => setConfig({ ...config, headerColor: e.target.value })}
+                                    className={styles.input}
+                                />
+                            </div>
+                        </div>
                     </>
                 )}
             </div>
