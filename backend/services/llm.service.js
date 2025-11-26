@@ -118,7 +118,7 @@ class LLMService {
     /**
      * Call Google Gemini API
      */
-    async callGemini(apiKey, messages, model = 'gemini-pro') {
+    async callGemini(apiKey, messages, model = 'gemini-2.0-flash-exp') {
         try {
             // Convert messages to Gemini format
             const systemMsg = messages.find(m => m.role === 'system');
