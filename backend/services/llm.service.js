@@ -37,7 +37,7 @@ class LLMService {
         }
 
         // Build system prompt from bot configuration
-        const systemPrompt = this.buildSystemPrompt(bot);
+        const systemPrompt = bot.system_prompt || this.buildSystemPrompt(bot);
 
         // Format conversation history
         const formattedMessages = [

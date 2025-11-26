@@ -15,6 +15,7 @@ router.post('/create', async (req, res) => {
             personality,
             tone,
             knowledge_base,
+            system_prompt, // New field
             llm_provider,
             llm_model,
             api_key,
@@ -43,16 +44,17 @@ router.post('/create', async (req, res) => {
         // Insert bot into database
         const result = db.prepare(`
       INSERT INTO bots (
-        user_id, name, personality, tone, knowledge_base,
+        user_id, name, personality, tone, knowledge_base, system_prompt,
         llm_provider, llm_model, encrypted_api_key,
         egg_design, redemption_code, price
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `).run(
             userId || null,
             name,
             JSON.stringify(personality),
             tone || 'neutral',
             knowledge_base,
+            system_prompt || null,
             llm_provider,
             llm_model || null,
             encryptedApiKey,

@@ -6,12 +6,12 @@ import { createBot, simulatePayment } from '../utils/api';
 import styles from './VendingMachine.module.css';
 
 const PERSONALITY_ARCHETYPES = [
-    { name: 'Witty', emoji: '😏', color: '#ff2e97', pattern: 'zigzag' },
-    { name: 'Stoic', emoji: '🗿', color: '#6366f1', pattern: 'lines' },
-    { name: 'Enthusiastic', emoji: '🌟', color: '#ffaa00', pattern: 'stars' },
-    { name: 'Mysterious', emoji: '🌙', color: '#b84dff', pattern: 'myst' },
-    { name: 'Friendly', emoji: '🤗', color: '#00ff88', pattern: 'dots' },
-    { name: 'Professional', emoji: '💼', color: '#00d9ff', pattern: 'grid' },
+    { name: 'Executive', emoji: '👔', color: '#4f46e5', pattern: 'solid' },
+    { name: 'Analyst', emoji: '📊', color: '#0ea5e9', pattern: 'grid' },
+    { name: 'Support', emoji: '🎧', color: '#10b981', pattern: 'dots' },
+    { name: 'Creative', emoji: '🎨', color: '#f59e0b', pattern: 'waves' },
+    { name: 'Coder', emoji: '💻', color: '#6366f1', pattern: 'binary' },
+    { name: 'Sales', emoji: '🤝', color: '#ef4444', pattern: 'lines' },
 ];
 
 const LLM_PROVIDERS = [
@@ -28,10 +28,12 @@ export default function VendingMachine() {
         personality: PERSONALITY_ARCHETYPES[0],
         tone: 50, // 0-100 slider (formal to casual)
         knowledgeBase: '',
+        systemPrompt: '', // New field for advanced mode
         llmProvider: 'botomatic',
         apiKey: '',
         llmModel: '',
     });
+    const [showAdvanced, setShowAdvanced] = useState(false);
     const [result, setResult] = useState(null);
     const [loading, setLoading] = useState(false);
     const [showEggAnimation, setShowEggAnimation] = useState(false);
@@ -55,7 +57,7 @@ export default function VendingMachine() {
             const toneText = config.tone < 33 ? 'formal' : config.tone > 66 ? 'casual' : 'neutral';
 
             const botData = {
-                name: config.name || `${config.personality.name} Bot`,
+                name: config.name || `${config.personality.name} Agent`,
                 personality: {
                     archetype: config.personality.name,
                     color: config.personality.color,
@@ -63,6 +65,7 @@ export default function VendingMachine() {
                 },
                 tone: toneText,
                 knowledge_base: config.knowledgeBase,
+                system_prompt: config.systemPrompt || null, // Pass system prompt
                 llm_provider: config.llmProvider,
                 llm_model: config.llmModel || null,
                 api_key: config.apiKey || null,
@@ -90,8 +93,8 @@ export default function VendingMachine() {
             <div className={styles.machine}>
                 {/* Header */}
                 <div className={styles.header}>
-                    <h1 className={styles.logo}>🤖 BOT-O-MATIC</h1>
-                    <p className={styles.tagline}>Create Your Custom AI Chatbot</p>
+                    <h1 className={styles.logo}>⚡ AI AGENT STUDIO</h1>
+                    <p className={styles.tagline}>Forge Your Enterprise Intelligence</p>
                 </div>
 
                 {/* Egg Animation Overlay */}
@@ -114,6 +117,8 @@ export default function VendingMachine() {
                         <Step1Customization
                             config={config}
                             setConfig={setConfig}
+                            showAdvanced={showAdvanced}
+                            setShowAdvanced={setShowAdvanced}
                             onNext={() => setStep(2)}
                         />
                     )}
@@ -147,14 +152,14 @@ export default function VendingMachine() {
 }
 
 // Step 1: Customization
-function Step1Customization({ config, setConfig, onNext }) {
+function Step1Customization({ config, setConfig, showAdvanced, setShowAdvanced, onNext }) {
     return (
         <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             className={styles.step}
         >
-            <h2>Step 1: Customize Your Bot</h2>
+            <h2>Step 1: Configure Agent</h2>
 
             {/* Personality Selection */}
             <div className={styles.section}>
@@ -196,15 +201,41 @@ function Step1Customization({ config, setConfig, onNext }) {
 
             {/* Knowledge Base */}
             <div className={styles.section}>
-                <label>Knowledge Base</label>
-                <textarea
-                    placeholder="e.g., Expert on Ancient Roman history and culture..."
-                    value={config.knowledgeBase}
-                    onChange={(e) => setConfig({ ...config, knowledgeBase: e.target.value })}
-                    className={styles.textarea}
-                    rows={4}
-                />
-                <small className={styles.hint}>Describe what your bot should know about</small>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
+                    <label>Knowledge Base</label>
+                    <button
+                        className="btn-outline"
+                        style={{ padding: '0.2rem 0.5rem', fontSize: '0.8rem' }}
+                        onClick={() => setShowAdvanced(!showAdvanced)}
+                    >
+                        {showAdvanced ? 'Simple Mode' : 'Advanced Mode'}
+                    </button>
+                </div>
+
+                {!showAdvanced ? (
+                    <>
+                        <textarea
+                            placeholder="e.g., Expert on SaaS sales metrics and closing strategies..."
+                            value={config.knowledgeBase}
+                            onChange={(e) => setConfig({ ...config, knowledgeBase: e.target.value })}
+                            className={styles.textarea}
+                            rows={4}
+                        />
+                        <small className={styles.hint}>Describe what your agent should know about</small>
+                    </>
+                ) : (
+                    <>
+                        <textarea
+                            placeholder="You are a helpful AI assistant..."
+                            value={config.systemPrompt}
+                            onChange={(e) => setConfig({ ...config, systemPrompt: e.target.value })}
+                            className={styles.textarea}
+                            rows={8}
+                            style={{ fontFamily: 'monospace' }}
+                        />
+                        <small className={styles.hint}>Directly edit the System Prompt (overrides auto-generation)</small>
+                    </>
+                )}
             </div>
 
             {/* Bot Name */}
@@ -222,10 +253,10 @@ function Step1Customization({ config, setConfig, onNext }) {
             <button
                 className="btn-neon"
                 onClick={onNext}
-                disabled={!config.knowledgeBase}
+                disabled={!config.knowledgeBase && !config.systemPrompt}
                 style={{ width: '100%', padding: '1rem', fontSize: '1.1rem' }}
             >
-                Next: Choose API →
+                Next: Select Intelligence →
             </button>
         </motion.div>
     );
@@ -438,35 +469,44 @@ function Step4Success({ result }) {
     );
 }
 
-// Egg Formation Animation
+// Egg Formation Animation (Refactored to Neural Synthesis)
 function EggFormationAnimation({ personality }) {
     return (
         <div className={styles.eggAnimation}>
             <motion.div
                 className={styles.ingredients}
-                initial={{ opacity: 1, y: -50 }}
-                animate={{ opacity: 0, y: 100 }}
-                transition={{ duration: 1.5 }}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.5 }}
             >
-                <div className={styles.ingredient}>{personality.emoji}</div>
-                <div className={styles.ingredient}>🧠</div>
-                <div className={styles.ingredient}>✨</div>
+                <div className={styles.ingredient} style={{ fontSize: '4rem' }}>{personality.emoji}</div>
             </motion.div>
 
             <motion.div
                 className={styles.egg}
-                initial={{ scale: 0, rotate: -180 }}
-                animate={{ scale: 1, rotate: 0 }}
-                transition={{ delay: 1, duration: 1, type: 'spring' }}
+                initial={{ scale: 0, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                transition={{ delay: 0.5, duration: 1 }}
                 style={{
-                    background: `linear-gradient(135deg, ${personality.color}, ${personality.color}88)`,
-                    boxShadow: `0 0 50px ${personality.color}`,
+                    background: `radial-gradient(circle, ${personality.color}, transparent)`,
+                    boxShadow: `0 0 100px ${personality.color}`,
+                    borderRadius: '50%',
+                    width: '200px',
+                    height: '200px',
+                    filter: 'blur(10px)',
                 }}
             >
                 <motion.div
-                    className={styles.eggGlow}
-                    animate={{ opacity: [0.5, 1, 0.5] }}
-                    transition={{ duration: 2, repeat: Infinity }}
+                    animate={{ rotate: 360 }}
+                    transition={{ duration: 10, repeat: Infinity, ease: "linear" }}
+                    style={{
+                        width: '100%',
+                        height: '100%',
+                        border: `2px solid ${personality.color}`,
+                        borderRadius: '50%',
+                        borderTopColor: 'transparent',
+                        borderBottomColor: 'transparent',
+                    }}
                 />
             </motion.div>
 
@@ -474,9 +514,10 @@ function EggFormationAnimation({ personality }) {
                 className={styles.animationText}
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
-                transition={{ delay: 2 }}
+                transition={{ delay: 1 }}
+                style={{ marginTop: '2rem', fontSize: '1.2rem', letterSpacing: '0.1em' }}
             >
-                Creating your bot...
+                INITIALIZING NEURAL CORE...
             </motion.p>
         </div>
     );
