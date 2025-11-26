@@ -1,6 +1,11 @@
 import axios from 'axios';
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+let API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
+
+// Handle Render's host-only variable
+if (API_URL && !API_URL.startsWith('http')) {
+    API_URL = `https://${API_URL}`;
+}
 
 // Create axios instance
 const api = axios.create({

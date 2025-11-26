@@ -13,7 +13,17 @@ const PORT = process.env.PORT || 3001;
 
 // Middleware
 app.use(cors({
-    origin: process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000',
+    origin: (origin, callback) => {
+        const allowedOrigin = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+        // Handle Render's host-only variable by prepending https:// if needed
+        const normalizedOrigin = allowedOrigin.startsWith('http') ? allowedOrigin : `https://${allowedOrigin}`;
+
+        if (!origin || origin === normalizedOrigin) {
+            callback(null, true);
+        } else {
+            callback(new Error('Not allowed by CORS'));
+        }
+    },
     credentials: true
 }));
 

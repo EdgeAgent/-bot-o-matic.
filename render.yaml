@@ -13,7 +13,7 @@ services:
       - key: PORT
         value: 10000
       - key: DATABASE_PATH
-        value: /app/data/botomatic.db
+        value: ./data/botomatic.db
       - key: DEFAULT_LLM_PROVIDER
         value: openai
       - key: JWT_SECRET
@@ -28,15 +28,11 @@ services:
         sync: false
       - key: STRIPE_PUBLISHABLE_KEY
         sync: false
-      - key: CORS_ORIGIN
+      - key: NEXT_PUBLIC_APP_URL
         fromService:
           type: web
           name: bot-o-matic-frontend
-          property: url
-    disk:
-      name: bot-o-matic-data
-      mountPath: /app/data
-      sizeGB: 1
+          property: host
 
   # Frontend Service
   - type: web
@@ -51,7 +47,7 @@ services:
         fromService:
           type: web
           name: bot-o-matic-backend
-          property: url
+          property: host
       - key: NEXT_PUBLIC_DEMO_MODE
         value: "false"
       - key: NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY
