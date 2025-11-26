@@ -15,11 +15,13 @@ services:
       - key: DATABASE_PATH
         value: ./data/botomatic.db
       - key: DEFAULT_LLM_PROVIDER
-        value: openai
+        value: gemini
       - key: JWT_SECRET
         generateValue: true
       - key: ENCRYPTION_KEY
         generateValue: true
+      - key: DEFAULT_GEMINI_API_KEY
+        sync: false
       - key: DEFAULT_OPENAI_API_KEY
         sync: false
       - key: STRIPE_SECRET_KEY
