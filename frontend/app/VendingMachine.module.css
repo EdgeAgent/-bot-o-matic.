@@ -1,3 +1,151 @@
+/* Landing Page Styles */
+.landingContainer {
+    width: 100%;
+    min-height: 100vh;
+    background: var(--color-bg-dark);
+    color: var(--color-text-primary);
+    overflow-x: hidden;
+}
+
+.landingNav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 2rem 5%;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.navLogo {
+    font-size: 1.5rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.heroSection {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 4rem 5%;
+    max-width: 1200px;
+    margin: 0 auto;
+    min-height: 80vh;
+}
+
+.heroContent {
+    flex: 1;
+    max-width: 600px;
+}
+
+.heroContent h1 {
+    font-size: 4rem;
+    line-height: 1.1;
+    margin-bottom: 1.5rem;
+    font-weight: 800;
+}
+
+.gradientText {
+    background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.heroContent p {
+    font-size: 1.25rem;
+    color: var(--color-text-secondary);
+    margin-bottom: 2.5rem;
+    line-height: 1.6;
+}
+
+.trustBadge {
+    margin-top: 4rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    padding-top: 2rem;
+}
+
+.trustBadge p {
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    margin-bottom: 1rem;
+    color: var(--color-text-muted);
+}
+
+.logos {
+    display: flex;
+    gap: 2rem;
+    opacity: 0.5;
+    font-weight: 600;
+    font-size: 1.2rem;
+}
+
+.heroVisual {
+    flex: 1;
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.glowingOrb {
+    width: 400px;
+    height: 400px;
+    background: radial-gradient(circle, var(--color-primary), transparent 70%);
+    opacity: 0.2;
+    filter: blur(60px);
+    position: absolute;
+    z-index: 0;
+}
+
+.glassPanel {
+    background: rgba(255, 255, 255, 0.03);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 1rem;
+    padding: 2rem;
+    width: 400px;
+    transform: rotate(-5deg);
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+    z-index: 1;
+}
+
+.codeSnippet code {
+    font-family: 'Fira Code', monospace;
+    font-size: 0.9rem;
+    line-height: 1.5;
+}
+
+.featuresSection {
+    padding: 6rem 5%;
+    max-width: 1200px;
+    margin: 0 auto;
+    text-align: center;
+}
+
+.featuresSection h2 {
+    font-size: 2.5rem;
+    margin-bottom: 4rem;
+}
+
+.featuresGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 2rem;
+    text-align: left;
+}
+
+.landingFooter {
+    text-align: center;
+    padding: 4rem 0;
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+    color: var(--color-text-muted);
+    margin-top: 4rem;
+}
+
+/* Agent Studio Styles */
 .container {
     min-height: 100vh;
     display: flex;
@@ -162,6 +310,16 @@
 .input {
     width: 100%;
     padding: 0.75rem;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius-sm);
+    color: var(--color-text);
+}
+
+.input:focus {
+    outline: none;
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2);
 }
 
 .hint {
@@ -383,5 +541,20 @@
     .qrCode img {
         width: 200px;
         height: 200px;
+    }
+
+    .heroSection {
+        flex-direction: column;
+        text-align: center;
+        padding-top: 2rem;
+    }
+
+    .heroContent h1 {
+        font-size: 2.5rem;
+    }
+
+    .heroVisual {
+        margin-top: 3rem;
+        transform: scale(0.8);
     }
 }

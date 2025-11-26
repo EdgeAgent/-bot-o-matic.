@@ -2,19 +2,39 @@
 
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
+import { useRouter } from 'next/navigation';
 import { getUserBots } from '../../utils/api';
+import { useAuth } from '../../contexts/AuthContext';
 import styles from './Dashboard.module.css';
 
 export default function Dashboard() {
     const [bots, setBots] = useState([]);
     const [loading, setLoading] = useState(true);
+    const { user, loading: authLoading } = useAuth();
+    const router = useRouter();
 
     useEffect(() => {
-        // For demo, we'll show message to use redemption codes
-        setLoading(false);
-    }, []);
+        if (!authLoading) {
+            if (!user) {
+                router.push('/login');
+                return;
+            }
+            fetchBots();
+        }
+    }, [user, authLoading]);
 
-    if (loading) {
+    const fetchBots = async () => {
+        try {
+            const response = await getUserBots(user.id);
+            setBots(response.data.bots);
+        } catch (error) {
+            console.error('Failed to fetch bots:', error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    if (authLoading || loading) {
         return (
             <div className={styles.container}>
                 <div className={styles.loading}>Loading...</div>

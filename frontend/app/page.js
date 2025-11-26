@@ -2,7 +2,9 @@
 
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useRouter } from 'next/navigation';
 import { createBot, simulatePayment } from '../utils/api';
+import { useAuth } from '../contexts/AuthContext';
 import styles from './VendingMachine.module.css';
 
 const PERSONALITY_ARCHETYPES = [
@@ -21,7 +23,163 @@ const LLM_PROVIDERS = [
     { id: 'anthropic', name: 'Anthropic Claude', price: 1000, desc: 'Use your own API key', requiresKey: true },
 ];
 
-export default function VendingMachine() {
+export default function Home() {
+    const [view, setView] = useState('landing'); // 'landing' | 'studio'
+
+    return (
+        <main>
+            <AnimatePresence mode="wait">
+                {view === 'landing' ? (
+                    <LandingPage key="landing" onStart={() => setView('studio')} />
+                ) : (
+                    <AgentStudio key="studio" />
+                )}
+            </AnimatePresence>
+        </main>
+    );
+}
+
+function LandingPage({ onStart }) {
+    const { user, logout } = useAuth();
+    const router = useRouter();
+
+    return (
+        <motion.div
+            className={styles.landingContainer}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0, y: -20 }}
+            transition={{ duration: 0.5 }}
+        >
+            {/* Navbar */}
+            <nav className={styles.landingNav}>
+                <div className={styles.navLogo}>⚡ AI AGENT STUDIO</div>
+                <div style={{ display: 'flex', gap: '1rem' }}>
+                    {user ? (
+                        <>
+                            <button className="btn-outline" onClick={() => router.push('/dashboard')}>Dashboard</button>
+                            <button className="btn-outline" onClick={logout}>Logout</button>
+                        </>
+                    ) : (
+                        <button className="btn-outline" onClick={() => router.push('/login')}>Login</button>
+                    )}
+                </div>
+            </nav>
+
+            {/* Hero Section */}
+            <section className={styles.heroSection}>
+                <div className={styles.heroContent}>
+                    <motion.h1
+                        initial={{ y: 20, opacity: 0 }}
+                        animate={{ y: 0, opacity: 1 }}
+                        transition={{ delay: 0.2 }}
+                    >
+                        Deploy Enterprise-Grade<br />
+                        <span className={styles.gradientText}>AI Agents</span> in Minutes.
+                    </motion.h1>
+                    <motion.p
+                        initial={{ y: 20, opacity: 0 }}
+                        animate={{ y: 0, opacity: 1 }}
+                        transition={{ delay: 0.4 }}
+                    >
+                        The all-in-one forge for custom, secure, and branded AI assistants.
+                        Train on your data, customize your brand, and deploy globally.
+                    </motion.p>
+                    <motion.button
+                        className="btn-neon"
+                        onClick={onStart}
+                        initial={{ y: 20, opacity: 0 }}
+                        animate={{ y: 0, opacity: 1 }}
+                        transition={{ delay: 0.6 }}
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                        style={{ fontSize: '1.2rem', padding: '1rem 2.5rem' }}
+                    >
+                        Start Building Now →
+                    </motion.button>
+
+                    <motion.div
+                        className={styles.trustBadge}
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        transition={{ delay: 0.8 }}
+                    >
+                        <p>TRUSTED BY NEXT-GEN STARTUPS</p>
+                        <div className={styles.logos}>
+                            <span>ACME Corp</span>
+                            <span>Nebula AI</span>
+                            <span>QuantumSoft</span>
+                            <span>Vertex</span>
+                        </div>
+                    </motion.div>
+                </div>
+
+                <div className={styles.heroVisual}>
+                    <div className={styles.glowingOrb}></div>
+                    <div className={styles.glassPanel}>
+                        <div className={styles.codeSnippet}>
+                            <code>
+                                <span style={{ color: '#c678dd' }}>const</span> <span style={{ color: '#e5c07b' }}>agent</span> = <span style={{ color: '#c678dd' }}>new</span> <span style={{ color: '#61afef' }}>Agent</span>({'{'} <br />
+                                &nbsp;&nbsp;name: <span style={{ color: '#98c379' }}>"SalesBot"</span>,<br />
+                                &nbsp;&nbsp;model: <span style={{ color: '#98c379' }}>"Gemini-Pro"</span>,<br />
+                                &nbsp;&nbsp;security: <span style={{ color: '#d19a66' }}>true</span><br />
+                                {'}'});<br />
+                                <span style={{ color: '#e06c75' }}>await</span> agent.<span style={{ color: '#61afef' }}>deploy</span>();
+                            </code>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            {/* Features Section */}
+            <section className={styles.featuresSection}>
+                <h2>Why Choose Agent Studio?</h2>
+                <div className={styles.featuresGrid}>
+                    <FeatureCard
+                        icon="🧠"
+                        title="Custom Knowledge"
+                        desc="Train your agents on your specific business data, documents, and guidelines."
+                    />
+                    <FeatureCard
+                        icon="🎨"
+                        title="Full Branding"
+                        desc="White-label your agents with custom logos, colors, and domains."
+                    />
+                    <FeatureCard
+                        icon="🔒"
+                        title="Enterprise Security"
+                        desc="Bank-grade encryption for your API keys and conversation data."
+                    />
+                    <FeatureCard
+                        icon="⚡"
+                        title="Instant Deploy"
+                        desc="One-click deployment to a global edge network. No DevOps required."
+                    />
+                </div>
+            </section>
+
+            {/* Footer */}
+            <footer className={styles.landingFooter}>
+                <p>© 2025 AI Agent Studio. All rights reserved.</p>
+            </footer>
+        </motion.div>
+    );
+}
+
+function FeatureCard({ icon, title, desc }) {
+    return (
+        <motion.div
+            className="glass-card"
+            whileHover={{ y: -5 }}
+        >
+            <div style={{ fontSize: '2.5rem', marginBottom: '1rem' }}>{icon}</div>
+            <h3 style={{ marginBottom: '0.5rem' }}>{title}</h3>
+            <p style={{ color: 'var(--color-text-secondary)' }}>{desc}</p>
+        </motion.div>
+    );
+}
+
+function AgentStudio() {
     const [step, setStep] = useState(1);
     const [config, setConfig] = useState({
         name: '',
@@ -39,6 +197,8 @@ export default function VendingMachine() {
     const [result, setResult] = useState(null);
     const [loading, setLoading] = useState(false);
     const [showEggAnimation, setShowEggAnimation] = useState(false);
+    const { user } = useAuth();
+    const router = useRouter();
 
     const selectedProvider = LLM_PROVIDERS.find(p => p.id === config.llmProvider);
     const totalPrice = selectedProvider?.price || 500;
@@ -74,6 +234,7 @@ export default function VendingMachine() {
                 llm_model: config.llmModel || null,
                 api_key: config.apiKey || null,
                 price: totalPrice,
+                userId: user?.id // Associate bot with user
             };
 
             const response = await createBot(botData);
@@ -93,7 +254,12 @@ export default function VendingMachine() {
     };
 
     return (
-        <div className={styles.container}>
+        <motion.div
+            className={styles.container}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+        >
             <div className={styles.machine}>
                 {/* Header */}
                 <div className={styles.header}>
@@ -151,7 +317,7 @@ export default function VendingMachine() {
                     )}
                 </div>
             </div>
-        </div>
+        </motion.div>
     );
 }
 
